@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <style>
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#topBar {
+  background-color: #0076BD;
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  height: 50px;
+  align-items: center;
+  font-size: 20px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+}
+
+#topBar span {
+  cursor: pointer;
+}
+
+#userDropdown {
+  position: relative;
+  cursor: pointer;
+  color: white;
+  margin-right: 3%;
+  display: flex;
+  align-items: center;
+}
+
+#username {
+  margin-right: 10px;
+  color: white;
+}
+
+#dropdownContent {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  top: 30px;
+  right: 0;
+}
+
+#dropdownContent div {
+  padding: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 57px;
+  color: black;
+  font-size: 15px;
+  text-align: center;
+}
+
+#dropdownContent div:hover {
+  background-color: #ddd;
+}
+
+#sidebar {
+  background-color: #0076BD;
+  color: white;
+  width: 200px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 60px;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#sidebar div {
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  color: white;
+  text-align: center;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-content: space-around;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#teacherTab {
+  background-color: #01304d;
+}
+
+#sidebar div:hover {
+  background-color: #005283;
+}
+
+#content {
+  margin-left: 200px;
+  margin-top: 80px;
+  padding: 20px;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+}
+
+table,
+th,
+td {
+  border: 1px solid black;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: left;
+}
+
+form {
+  margin-bottom: 20px;
+}
+.popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  border-color: black;
+  border-width: 2px;
+  color: black;
+}
+
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.popup-buttons {
+  margin-top: 10px;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  color: black;
+}
+
+h2 {
+  color: rgb(255, 255, 255);
+  text-align: center;
+}
+
+form {
+  background-color: #005283;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: 50px auto;
+    color: white;
+}
+
+label {
+  display: block;
+  margin: 8px;
+}
+select  {
+  padding: 8px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+  border: 1px solid rgb(0, 0, 0);
+  border-radius: 4px;
+  background-color: #8e8e8e;
+  color: white;
+}
+#lessonForm select  {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+  border: 1px solid rgb(0, 0, 0);
+  border-radius: 4px;
+  background-color: white;
+  color: black;
+}
+
+button {
+  background-color: #8e8e8e;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #676767;
+}
+
+#filter{
+    display: flex;
+    
+}
+.dropdown-arrow {
+            display: inline-block;
+            margin-right: 5px;
+            transform: rotate(90deg);
+            transition: transform 0.3s;
+            font-size: 14px;
+            color: white;
+            rotate: 90deg;
+        }
+
+        #userDropdown.open .dropdown-arrow {
+            transform: rotate(0deg);
+        }
+
+#logoContainer {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+}
+
+#logoContainer img {
+    width: 178px;
+    height: auto;
+}
+
+#underlineText {
+    text-decoration: underline;
+    font-weight: bold;
+}
+    </style>
+</head>
+
+<body>
+    <div id="topBar">
+        <span id="underlineText">Stundenplan-Tool</span>
+        <div id="userDropdown" onclick="toggleDropdown()">
+            Hello&#160;<span id="username">Username</span>
+            <span class="dropdown-arrow">&#9654;</span>
+            <div id="dropdownContent">
+                <div onclick="confirmLogout()">Log Out</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebar">
+        <div id="timetableTab" onclick="changeTab('timetable')">Timetable</div>
+        <div id="teacherTab" onclick="openTeacherTab()">Teacher Area 🔒</div>
+    </div>
+    <div id="logoContainer">
+        <img src="https://prod.backend.eduwo.ch/uploads/5440/conversions/BZZ_logo-title.jpg" alt="Logo">
+    </div>
+
+    <div id="content">
+        <form id="lessonForm">
+            <h2>Create Lesson</h2>
+            <label for="classSelect">Select Class:</label>
+            <select id="classSelect"></select><br>
+    
+            <label for="teacherSelect">Select Teacher:</label>
+            <select id="teacherSelect"></select><br>
+    
+            <label for="roomSelect">Select Room:</label>
+            <select id="roomSelect"></select><br>
+    
+            <label for="daySelect">Select Day:</label>
+            <select id="daySelect">
+                <option value="1">Monday</option>
+                <option value="2">Tuesday</option>
+                <option value="3">Wednesday</option>
+                <option value="4">Thursday</option>
+                <option value="5">Friday</option>
+            </select><br>
+    
+            <label for="timeSelect">Select Time:</label>
+            <select id="timeSelect"></select><br>
+    
+            <button type="button" onclick="addLesson()">Submit</button>
+        </form>
+        <div id="filter">
+        <label for="filterClass">Filter by Class:</label>
+        <select id="filterClass" onchange="applyFilters()">
+            <option value="">All Classes</option>
+    
+        </select>
+        
+        <label for="filterTeacher">Filter by Teacher:</label>
+        <select id="filterTeacher" onchange="applyFilters()">
+            <option value="">All Teachers</option>
+    
+        </select>
+        
+        <label for="filterRoom">Filter by Room:</label>
+        <select id="filterRoom" onchange="applyFilters()">
+            <option value="">All Rooms</option>
+        </select>
+    </div>
+        <table id="lessonTable">
+            <thead>
+                <tr>
+                    <th>Class</th>
+                    <th>Teacher</th>
+                    <th>Room</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Popup for confirming logout -->
+    <div class="popup" id="logoutPopup">
+        <div class="popup-content">
+            <p>Are you sure you want to log out?</p>
+            <div class="popup-buttons">
+                <button onclick="logout()">Yes</button>
+                <button onclick="closePopup()">No</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+                async function fetchClassOptions() {
+            try {
+                const response = await fetch('/class-options');
+                const data = await response.json();
+
+                const classSelect = document.getElementById('classSelect');
+                classSelect.innerHTML = ''; // Clear existing options
+
+                // Populate the dropdown with class options
+                data.classes.forEach((className) => {
+                    const option = document.createElement('option');
+                    option.value = className.ClassID;
+                    option.textContent = className.Class;
+                    classSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching class options:', error);
+            }
+        }
+
+        async function fetchTeacherOptions() {
+            try {
+                const response = await fetch('/teacher-options');
+                const data = await response.json();
+
+                const teacherSelect = document.getElementById('teacherSelect');
+                teacherSelect.innerHTML = ''; // Clear existing options
+
+                // Populate the dropdown with teacher options
+                data.teachers.forEach((teacher) => {
+                    const option = document.createElement('option');
+                    option.value = teacher.TeacherID;
+                    option.textContent = teacher.Teacher;
+                    teacherSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching teacher options:', error);
+            }
+        }
+
+        async function fetchRoomOptions() {
+            try {
+                const response = await fetch('/room-options');
+                const data = await response.json();
+
+                const roomSelect = document.getElementById('roomSelect');
+                roomSelect.innerHTML = ''; // Clear existing options
+
+                // Populate the dropdown with room options
+                data.rooms.forEach((room) => {
+                    const option = document.createElement('option');
+                    option.value = room.RoomID;
+                    option.textContent = room.Room_name;
+                    roomSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching room options:', error);
+            }
+        }
+
+        async function fetchTimeOptions() {
+            try {
+                const response = await fetch('/time-options');
+                const data = await response.json();
+
+                const timeSelect = document.getElementById('timeSelect');
+                timeSelect.innerHTML = ''; // Clear existing options
+
+                // Populate the dropdown with time options
+                data.times.forEach((time) => {
+                    const option = document.createElement('option');
+                    option.value = time.TimeID;
+                    option.textContent = time.Time_slots;
+                    timeSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching time options:', error);
+            }
+        }
+
+        async function fetchLessons() {
+            try {
+                const response = await fetch('/lessons');
+                const data = await response.json();
+
+                const lessonTable = document.getElementById('lessonTable');
+                const tbody = lessonTable.querySelector('tbody');
+                tbody.innerHTML = ''; // Clear existing rows
+
+                // Populate the table with lesson data
+                data.lessons.forEach((lesson) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${lesson.Class}</td>
+                        <td>${lesson.Teacher}</td>
+                        <td>${lesson.Room_name}</td>
+                        <td>${getDayName(lesson.Day)}</td>
+                        <td>${lesson.Time_slots}</td>
+                        <td>
+                            <button onclick="redirectEditPage(${lesson.LessonID})">Edit</button>
+                            <button onclick="deleteLesson(${lesson.LessonID})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching lessons:', error);
+            }
+        }
+
+        function redirectEditPage(lessonID) {
+            window.location.href = `/admin_edit.html?lessonID=${lessonID}`;
+        }
+        
+        
+        // Initial load or any other necessary setup
+        fetchClassOptions();
+        fetchTeacherOptions();
+        fetchRoomOptions();
+        fetchTimeOptions();
+        fetchLessons();
+        async function addLesson() {
+            const classID = document.getElementById('classSelect').value;
+            const teacherID = document.getElementById('teacherSelect').value;
+            const roomID = document.getElementById('roomSelect').value;
+            const day = document.getElementById('daySelect').value;
+            const timeID = document.getElementById('timeSelect').value;
+
+            const data = {
+                classID: classID,
+                teacherID: teacherID,
+                roomID: roomID,
+                day: day,
+                timeID: timeID
+            };
+
+            try {
+                const response = await fetch('/add-lesson', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                // Fetch and update the lesson table after adding a new lesson
+                fetchLessons();
+            } catch (error) {
+                console.error('Error adding lesson:', error);
+            }
+        }
+
+        async function editLesson(lessonID) {
+            // Implement the edit functionality as needed
+            console.log(`Edit lesson with ID ${lessonID}`);
+        }
+
+        async function fetchFilterOptions() {
+            try {
+                const classResponse = await fetch('/class-options');
+                const classData = await classResponse.json();
+
+                const teacherResponse = await fetch('/teacher-options');
+                const teacherData = await teacherResponse.json();
+
+                const roomResponse = await fetch('/room-options');
+                const roomData = await roomResponse.json();
+
+                const filterClass = document.getElementById('filterClass');
+                const filterTeacher = document.getElementById('filterTeacher');
+                const filterRoom = document.getElementById('filterRoom');
+
+                // Populate the dropdowns with filter options
+                classData.classes.forEach((className) => {
+                    const option = document.createElement('option');
+                    option.value = className.ClassID;
+                    option.textContent = className.Class;
+                    filterClass.appendChild(option);
+                });
+
+                teacherData.teachers.forEach((teacher) => {
+                    const option = document.createElement('option');
+                    option.value = teacher.TeacherID;
+                    option.textContent = teacher.Teacher;
+                    filterTeacher.appendChild(option);
+                });
+
+                roomData.rooms.forEach((room) => {
+                    const option = document.createElement('option');
+                    option.value = room.RoomID;
+                    option.textContent = room.Room_name;
+                    filterRoom.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching filter options:', error);
+            }
+        }
+
+        function applyFilters() {
+            const filterClass = document.getElementById('filterClass').value;
+            const filterTeacher = document.getElementById('filterTeacher').value;
+            const filterRoom = document.getElementById('filterRoom').value;
+
+            fetchFilteredLessons(filterClass, filterTeacher, filterRoom);
+        }
+
+        async function fetchFilteredLessons(classID, teacherID, roomID) {
+            try {
+                const response = await fetch(`/filtered-lessons?classID=${classID}&teacherID=${teacherID}&roomID=${roomID}`);
+                const data = await response.json();
+
+                const lessonTable = document.getElementById('lessonTable');
+                const tbody = lessonTable.querySelector('tbody');
+                tbody.innerHTML = ''; // Clear existing rows
+
+                // Populate the table with filtered lesson data
+                data.lessons.forEach((lesson) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${lesson.Class}</td>
+                        <td>${lesson.Teacher}</td>
+                        <td>${lesson.Room_name}</td>
+                        <td>${getDayName(lesson.Day)}</td>
+                        <td>${lesson.Time_slots}</td>
+                        <td>
+                            <button onclick="redirectEditPage(${lesson.LessonID})">Edit</button>
+                            <button onclick="deleteLesson(${lesson.LessonID})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching filtered lessons:', error);
+            }
+        }
+
+        async function deleteLesson(lessonID) {
+            try {
+                const response = await fetch(`/delete-lesson/${lessonID}`, {
+                    method: 'DELETE',
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                // Fetch and update the lesson table after deleting a lesson
+                applyFilters();
+            } catch (error) {
+                console.error(`Error deleting lesson with ID ${lessonID}:`, error);
+            }
+        }
+
+
+        // Helper function to get the day name based on the day number
+        function getDayName(day) {
+            const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            return daysOfWeek[day];
+        }
+
+        // Initial load or any other necessary setup
+        fetchClassOptions();
+        fetchTeacherOptions();
+        fetchRoomOptions();
+        fetchTimeOptions();
+        fetchLessons();
+        fetchFilterOptions(); // Fetch filter options on page load
+        applyFilters(); // Apply default filters
+        const dropdown = document.getElementById('dropdownContent');
+        const userDropdown = document.getElementById('userDropdown');
+        const usernameSpan = document.getElementById('username');
+        const logoutPopup = document.getElementById('logoutPopup');
+
+        
+
+        function changeTab(tabName) {
+            // Handle tab changes here
+            if (tabName === 'timetable') {
+                // Redirect to the home page or handle accordingly
+                window.location.href = '/home'; // Adjust the URL as needed
+            } else {
+                console.error('Invalid tab name:', tabName);
+            }
+        }
+
+        function openTeacherTab() {
+        // Check if the user is admin
+        const isAdmin = true; // Replace this with your actual logic for checking admin status
+
+        if (isAdmin) {
+            // Redirect to admin page for admin users
+            window.location.href = '/admin';
+        } else {
+            // Show confirmation popup for non-admin users
+            showPopup(logoutPopup);
+        }
+    }
+
+
+        function confirmLogout() {
+            // Show confirmation popup for logout
+            showPopup(logoutPopup);
+        }
+
+        function logout() {
+            // Adjust the logout functionality based on your server-side logic
+            // For now, let's simulate a logout by redirecting to the login page
+            window.location.href = '/';
+        }
+
+        function closePopup() {
+            // Close the currently open popup
+            hidePopup(logoutPopup);
+        }
+
+        function showPopup(popupElement) {
+    popupElement.style.display = 'flex';
+}
+
+function hidePopup(popupElement) {
+    popupElement.style.display = 'none';
+}
+        async function fetchUserData() {
+    try {
+        const response = await fetch('/user-info');
+        const userData = await response.json();
+
+        const usernameSpan = document.getElementById('username');
+        usernameSpan.textContent = userData.username;
+
+        // Call your existing function to fetch and update class options
+        fetchClassOptions(userData.defaultClass);
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
+}
+function toggleDropdown() {
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            userDropdown.classList.toggle('open', dropdown.style.display === 'block');
+        }
+        async function fetchClassOptions() {
+    try {
+        const response = await fetch('/class-options');
+        const data = await response.json();
+
+        const classSelect = document.getElementById('classSelect');
+        classSelect.innerHTML = ''; // Clear existing options
+
+        // Populate the dropdown with class options
+        data.classes.forEach((className) => {
+            const option = document.createElement('option');
+            option.value = className.ClassID;
+            option.textContent = className.Class;
+            classSelect.appendChild(option);
+        });
+
+        // Fetch user information to set the dynamic username and default class
+        await fetch('/user-info')
+            .then(response => response.json())
+            .then(data => {
+                // Set the dynamic username
+                const usernameSpan = document.getElementById('username');
+                usernameSpan.textContent = data.username;
+
+                // Set the default class based on user (modify accordingly)
+                classSelect.value = data.defaultClass || 'A';
+
+                
+            });
+    } catch (error) {
+        console.error('Error fetching class options:', error);
+    }
+}
+    </script>
+</body>
+
+</html>

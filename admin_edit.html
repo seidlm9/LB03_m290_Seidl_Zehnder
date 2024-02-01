@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Edit Page</title>
+    <style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #0076BD;
+    color: white;
+}
+
+h2 {
+    color: rgb(255, 255, 255);
+    text-align: center;
+}
+
+form {
+    background-color: #01304d;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 50px auto;
+    color: white;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+    border: 1px solid rgb(0, 0, 0);
+    border-radius: 4px;
+    background-color: white;
+    color: black;
+}
+
+button {
+    background-color: #8e8e8e;
+    color: white;  
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #676767;
+}
+    </style>
+</head>
+<body>
+    <h2>Edit Lesson</h2>
+
+    <form id="editLessonForm">
+        <label for="classSelect">Class:</label>
+        <select id="classSelect" name="classSelect"></select><br>
+
+        <label for="teacherSelect">Teacher:</label>
+        <select id="teacherSelect" name="teacherSelect"></select><br>
+
+        <label for="roomSelect">Room:</label>
+        <select id="roomSelect" name="roomSelect"></select><br>
+
+        <label for="daySelect">Day:</label>
+        <select id="daySelect" name="daySelect">
+            <option value="1">Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+        </select><br>
+
+        <label for="timeSelect">Time:</label>
+        <select id="timeSelect" name="timeSelect"></select><br>
+
+        <button type="button" onclick="applyEdit()">Apply Edit</button>
+    </form>
+
+    <script>
+        async function fetchClassOptions() {
+            try {
+                const response = await fetch('/class-options');
+                const data = await response.json();
+
+                const classSelect = document.getElementById('classSelect');
+                classSelect.innerHTML = ''; // Clear existing options
+
+                // Populate the dropdown with class options
+                data.classes.forEach((className) => {
+                    const option = document.createElement('option');
+                    option.value = className.ClassID;
+                    option.textContent = className.Class;
+                    classSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching class options:', error);
+            }
+        }
+
+        async function fetchTeacherOptions() {
+            try {
+                const response = await fetch('/teacher-options');
+                const data = await response.json();
+
+                const teacherSelect = document.getElementById('teacherSelect');
+                teacherSelect.innerHTML = ''; // Clear existing options
+
+                // Populate the dropdown with teacher options
+                data.teachers.forEach((teacher) => {
+                    const option = document.createElement('option');
+                    option.value = teacher.TeacherID;
+                    option.textContent = teacher.Teacher;
+                    teacherSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching teacher options:', error);
+            }
+        }
+
+        async function fetchRoomOptions() {
+            try {
+                const response = await fetch('/room-options');
+                const data = await response.json();
+
+                const roomSelect = document.getElementById('roomSelect');
+                roomSelect.innerHTML = ''; // Clear existing options
+
+                // Populate the dropdown with room options
+                data.rooms.forEach((room) => {
+                    const option = document.createElement('option');
+                    option.value = room.RoomID;
+                    option.textContent = room.Room_name;
+                    roomSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching room options:', error);
+            }
+        }
+
+        async function fetchTimeOptions() {
+            try {
+                const response = await fetch('/time-options');
+                const data = await response.json();
+
+                const timeSelect = document.getElementById('timeSelect');
+                timeSelect.innerHTML = ''; // Clear existing options
+
+                // Populate the dropdown with time options
+                data.times.forEach((time) => {
+                    const option = document.createElement('option');
+                    option.value = time.TimeID;
+                    option.textContent = time.Time_slots;
+                    timeSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching time options:', error);
+            }
+        }
+
+        async function fetchLessonData() {
+        const lessonID = window.location.search.split('=')[1];
+        try {
+            const response = await fetch(`/lesson/${lessonID}`);
+            const data = await response.json();
+
+            // Dynamically populate the form with lesson data
+            document.getElementById('classSelect').value = data.lesson.ClassID;
+            document.getElementById('teacherSelect').value = data.lesson.TeacherID;
+            document.getElementById('roomSelect').value = data.lesson.RoomID;
+            document.getElementById('daySelect').value = data.lesson.Day;
+            document.getElementById('timeSelect').value = data.lesson.TimeID;
+        } catch (error) {
+            console.error('Error fetching lesson data:', error);
+        }
+    }
+
+    async function applyEdit() {
+        const lessonID = window.location.search.split('=')[1];
+        const classID = document.getElementById('classSelect').value;
+        const teacherID = document.getElementById('teacherSelect').value;
+        const roomID = document.getElementById('roomSelect').value;
+        const day = document.getElementById('daySelect').value;
+        const timeID = document.getElementById('timeSelect').value;
+
+        const data = {
+            classID: classID,
+            teacherID: teacherID,
+            roomID: roomID,
+            day: day,
+            timeID: timeID
+        };
+
+        try {
+            const response = await fetch(`/edit-lesson/${lessonID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            // Redirect back to the admin page after applying the edit
+            window.location.href = '/admin';
+        } catch (error) {
+            console.error('Error applying edit:', error);
+        }
+    }
+
+    // Fetch and populate lesson data on page load
+    fetchClassOptions();
+    fetchTeacherOptions();
+    fetchRoomOptions();
+    fetchTimeOptions();
+    fetchLessonData();
+        // Fetch and populate lesson data on page load
+        const lessonID = window.location.pathname.split('/').pop(); // Extract lessonID from URL
+        fetchLessonData(lessonID);
+    </script>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+ body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+ #logoContainer {
+     position: fixed;
+     bottom: 10px;
+     left: 10px;
+ }
+
+ #logoContainer img {
+     width: 178px;
+     height: auto;
+ }
+
+#topBar {
+  background-color: #0076BD;
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  height: 50px;
+  align-items: center;
+  font-size: 20px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+}
+
+#topBar span {
+  cursor: pointer;
+}
+
+#userDropdown {
+  position: relative;
+  cursor: pointer;
+  color: white;
+  margin-right: 3%;
+  display: flex;
+  align-items: center;
+}
+
+#username {
+  margin-right: 10px;
+  color: white;
+}
+
+#dropdownContent {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  top: 30px;
+  right: 0;
+}
+
+#dropdownContent div {
+  padding: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 57px;
+  color: black;
+  font-size: 15px;
+  text-align: center;
+}
+
+#dropdownContent div:hover {
+  background-color: #ddd;
+}
+
+#sidebar {
+  background-color: #0076BD;
+  color: white;
+  width: 200px;
+  height: 150vh;
+  position: fixed;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#sidebar div {
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  color: white;
+  text-align: center;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-content: space-around;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#timetableTab {
+  background-color: #01304d;
+}
+
+#sidebar div:hover {
+  background-color: #005283;
+}
+
+#content {
+  margin-left: 200px;
+  margin-top: 80px;
+  padding: 20px;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+}
+
+table,
+th,
+td {
+  border: 1px solid black;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: left;
+}
+
+form {
+  margin-bottom: 20px;
+}
+.popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  border-color: black;
+  border-width: 2px;
+}
+
+.popup-content {
+  background: #0076BD;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+    color: white;
+}
+
+.popup-buttons {
+  margin-top: 10px;
+}
+
+ #underlineText {
+     text-decoration: underline;
+     font-weight: bold;
+ }
+
+ #classSelect{
+     background-color: #8e8e8e;
+     color: white;
+ }
+    </style>
+</head>
+
+<body>
+    <div id="topBar">
+        <span id="underlineText">Stundenplan-Tool</span>
+        <div id="userDropdown" onclick="toggleDropdown()">
+            Hello&#160;<span id="username">Username</span>
+            <span class="dropdown-arrow">&#9654;</span>
+            <div id="dropdownContent">
+                <div onclick="confirmLogout()">Log Out</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebar">
+        <div id="timetableTab" onclick="changeTab('timetable')">Timetable</div>
+        <div id="teacherTab" onclick="openTeacherTab()">Teacher Area 🔒</div>
+    </div>
+    <div id="logoContainer">
+        <img src="https://prod.backend.eduwo.ch/uploads/5440/conversions/BZZ_logo-title.jpg" alt="Logo">
+    </div>
+
+    <div id="content">
+        <label for="classSelect">Select Class:</label>
+        <select id="classSelect" onchange="filterTimetable()">
+            <!-- Dropdown options will be dynamically generated here -->
+        </select>        
+
+        <table id="timetable">
+            <thead>
+                <tr>
+                    <th>Time/Day</th>
+                    <th>Monday</th>
+                    <th>Tuesday</th>
+                    <th>Wednesday</th>
+                    <th>Thursday</th>
+                    <th>Friday</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Timetable rows will be dynamically generated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Popup for confirming logout -->
+    <div class="popup" id="logoutPopup">
+        <div class="popup-content">
+            <p>Are you sure you want to log out?</p>
+            <div class="popup-buttons">
+                <button onclick="logout()">Yes</button>
+                <button onclick="closePopup()">No</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropdown = document.getElementById('dropdownContent');
+        const userDropdown = document.getElementById('userDropdown');
+        const usernameSpan = document.getElementById('username');
+        const logoutPopup = document.getElementById('logoutPopup');
+
+       async function fetchClassOptions() {
+    try {
+        const response = await fetch('/class-options');
+        const data = await response.json();
+
+        const classSelect = document.getElementById('classSelect');
+        classSelect.innerHTML = ''; // Clear existing options
+
+        // Populate the dropdown with class options
+        data.classes.forEach((className) => {
+            const option = document.createElement('option');
+            option.value = className.ClassID;
+            option.textContent = className.Class;
+            classSelect.appendChild(option);
+        });
+
+        // Fetch user information to set the dynamic username and default class
+        await fetch('/user-info')
+            .then(response => response.json())
+            .then(data => {
+                // Set the dynamic username
+                const usernameSpan = document.getElementById('username');
+                usernameSpan.textContent = data.username;
+
+                // Set the default class based on user (modify accordingly)
+                classSelect.value = data.defaultClass || 'A';
+
+                // Trigger timetable update with the default class
+                filterTimetable();
+            });
+    } catch (error) {
+        console.error('Error fetching class options:', error);
+    }
+}
+async function filterTimetable() {
+    const selectedClass = document.getElementById('classSelect').value;
+
+    try {
+        const response = await fetch(`/timetable/${selectedClass}`);
+        const data = await response.json();
+
+        const timetableTable = document.getElementById('timetable');
+        const tbody = timetableTable.querySelector('tbody');
+        tbody.innerHTML = ''; // Clear existing rows
+
+        // Populate the timetable table with data
+        data.timetableData.forEach((lesson) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${lesson.Time_slots}</td>
+                <td>${lesson.Day === 1 ? getLessonInfo(lesson) : ''}</td>
+                <td>${lesson.Day === 2 ? getLessonInfo(lesson) : ''}</td>
+                <td>${lesson.Day === 3 ? getLessonInfo(lesson) : ''}</td>
+                <td>${lesson.Day === 4 ? getLessonInfo(lesson) : ''}</td>
+                <td>${lesson.Day === 5 ? getLessonInfo(lesson) : ''}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Error fetching timetable data:', error);
+    }
+}
+
+function getLessonInfo(lesson) {
+    // Modify this function to extract and display the desired information
+    const teacherName = lesson.Teacher;
+    const roomName = lesson.Room_name;
+    return `${teacherName} <br>${roomName}`;
+}
+        function toggleDropdown() {
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            userDropdown.classList.toggle('open', dropdown.style.display === 'block');
+        }
+
+        function changeTab(tabName) {
+            const content = document.getElementById('content');
+
+            switch (tabName) {
+                case 'timetable':
+                    content.innerHTML = `
+                        <label for="classSelect">Select Class:</label>
+                        <select id="classSelect" onchange="filterTimetable()">
+                            <!-- Dropdown options will be dynamically generated here -->
+                        </select>
+
+                        <table id="timetable">
+                            <thead>
+                                <tr>
+                                    <th>Time/Day</th>
+                                    <th>Monday</th>
+                                    <th>Tuesday</th>
+                                    <th>Wednesday</th>
+                                    <th>Thursday</th>
+                                    <th>Friday</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Timetable rows will be dynamically generated here -->
+                            </tbody>
+                        </table>
+                    `;
+                    // Fetch data and setup for the timetable
+                    fetchClassOptions();
+                    break;
+
+                // Add more cases for additional tabs
+
+                default:
+                    console.error('Invalid tab name:', tabName);
+            }
+        }
+
+        function openTeacherTab() {
+        // Check if the user is admin
+        const isAdmin = true; // Replace this with your actual logic for checking admin status
+
+        if (isAdmin) {
+            // Redirect to admin page for admin users
+            window.location.href = '/admin';
+        } else {
+            // Show confirmation popup for non-admin users
+            showPopup(logoutPopup);
+        }
+    }
+
+
+        function confirmLogout() {
+            // Show confirmation popup for logout
+            showPopup(logoutPopup);
+        }
+
+        function logout() {
+            // Adjust the logout functionality based on your server-side logic
+            // For now, let's simulate a logout by redirecting to the login page
+            window.location.href = '/';
+        }
+
+        function closePopup() {
+            // Close the currently open popup
+            hidePopup(logoutPopup);
+        }
+
+        function showPopup(popupElement) {
+    popupElement.style.display = 'flex';
+}
+
+function hidePopup(popupElement) {
+    popupElement.style.display = 'none';
+}
+
+
+        // Initial load or any other necessary setup
+        fetchClassOptions();
+    </script>
+</body>
+
+</html>
